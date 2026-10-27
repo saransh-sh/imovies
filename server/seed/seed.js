@@ -69,7 +69,7 @@ const sampleMovies = [
 ];
 
 const seedDatabase = async () => {
-  const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/imovies';
+  const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/imovies';
   console.log(`[Seed] Connecting to MongoDB: ${mongoUri}...`);
   
   try {
