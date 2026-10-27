@@ -6,6 +6,7 @@
   "scripts": {
     "build": "npm --prefix client run build",
     "dev:server": "npm --prefix server run dev",
+    "dev:local": "npm --prefix server run dev:local",
     "dev:client": "npm --prefix client run dev",
     "start:server": "npm --prefix server start",
     "build:client": "npm --prefix client run build",
