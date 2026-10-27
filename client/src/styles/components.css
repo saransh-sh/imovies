@@ -1,0 +1,257 @@
+/* Neo-Brutalist Components Stylesheet */
+
+/* Buttons */
+.btn-brutal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--accent-yellow);
+  color: #000000;
+  border: var(--border-medium);
+  box-shadow: var(--shadow-medium);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+  user-select: none;
+}
+
+.btn-brutal:hover {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-small);
+  background: #FFE600;
+}
+
+.btn-brutal:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px #000;
+}
+
+.btn-brutal:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+.btn-brutal-magenta {
+  background: var(--accent-magenta);
+  color: #FFFFFF;
+}
+.btn-brutal-magenta:hover {
+  background: #E6004D;
+}
+
+.btn-brutal-cyan {
+  background: var(--accent-cyan);
+  color: #000000;
+}
+.btn-brutal-cyan:hover {
+  background: #00E5E5;
+}
+
+.btn-brutal-dark {
+  background: var(--bg-dark);
+  color: #FFFFFF;
+}
+.btn-brutal-dark:hover {
+  background: #2D2D2D;
+}
+
+.btn-brutal-sm {
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  border: var(--border-thin);
+  box-shadow: var(--shadow-small);
+}
+.btn-brutal-sm:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #000;
+}
+
+/* Cards */
+.card-brutal {
+  background: var(--bg-card);
+  border: var(--border-medium);
+  box-shadow: var(--shadow-large);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-brutal:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0px #000000;
+}
+
+/* Inputs & Form Elements */
+.input-brutal {
+  width: 100%;
+  border: var(--border-medium);
+  background: #FFFFFF;
+  padding: 12px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: #000000;
+  outline: none;
+  transition: box-shadow 0.1s ease;
+}
+
+.input-brutal:focus {
+  box-shadow: 4px 4px 0px var(--accent-yellow);
+}
+
+.select-brutal {
+  width: 100%;
+  border: var(--border-medium);
+  background: #FFFFFF;
+  padding: 12px 16px;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* Badges */
+.badge-brutal {
+  display: inline-block;
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: var(--border-thin);
+  background: var(--accent-yellow);
+}
+
+.badge-magenta {
+  background: var(--accent-magenta);
+  color: #FFFFFF;
+}
+
+.badge-green {
+  background: var(--accent-green);
+  color: #000000;
+}
+
+.badge-cyan {
+  background: var(--accent-cyan);
+  color: #000000;
+}
+
+.badge-red {
+  background: var(--accent-red);
+  color: #FFFFFF;
+}
+
+/* Marquee Ticker */
+.marquee-container {
+  background: var(--bg-dark);
+  color: var(--accent-yellow);
+  border-top: var(--border-medium);
+  border-bottom: var(--border-medium);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 10px 0;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee 25s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Navbar */
+.navbar-brutal {
+  background: #FFFFFF;
+  border-bottom: var(--border-thick);
+  padding: 16px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  background: var(--accent-yellow);
+  padding: 4px 12px;
+  border: var(--border-medium);
+  box-shadow: var(--shadow-small);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Alerts & Notices */
+.alert-brutal {
+  border: var(--border-medium);
+  padding: 14px 18px;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-small);
+}
+
+.alert-error {
+  background: #FFE5E5;
+  border-color: var(--accent-red);
+  color: #990000;
+}
+
+.alert-success {
+  background: #E5FFE5;
+  border-color: #00AA44;
+  color: #006622;
+}
+
+.alert-info {
+  background: #E5FFFF;
+  border-color: #0088AA;
+  color: #004455;
+}
+
+/* Footer */
+.footer-brutal {
+  background: var(--bg-dark);
+  color: var(--text-inverted);
+  border-top: var(--border-thick);
+  padding: 40px 20px;
+  margin-top: auto;
+}

@@ -1,0 +1,24 @@
+{
+  "name": "imovies",
+  "version": "1.0.0",
+  "description": "IMovies — Neo-Brutalist Movie Ticket Booking Platform (Capstone)",
+  "private": true,
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "start:server": "npm --prefix server start",
+    "build:client": "npm --prefix client run build",
+    "test": "npm --prefix server test",
+    "seed": "npm --prefix server run seed"
+  },
+  "keywords": [
+    "imovies",
+    "neo-brutalism",
+    "capstone",
+    "react",
+    "express",
+    "mongodb"
+  ],
+  "author": "Saransh",
+  "license": "MIT"
+}
