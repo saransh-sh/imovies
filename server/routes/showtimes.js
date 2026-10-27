@@ -2,10 +2,21 @@ const express = require('express');
 const router = express.Router();
 const Showtime = require('../models/Showtime');
 
+const mongoose = require('mongoose');
+
 // GET /api/showtimes/:id - Get showtime details + populated movie + booked seats
 router.get('/:id', async (req, res) => {
   try {
-    const showtime = await Showtime.findById(req.params.id).populate('movieId');
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: 'Showtime not found',
+      });
+    }
+
+    const showtime = await Showtime.findById(id).populate('movieId');
     if (!showtime) {
       return res.status(404).json({
         success: false,

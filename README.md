@@ -197,18 +197,20 @@ npm run dev:client
 
 ## 🧪 Automated Testing
 
-Run the automated backend test suite:
+Run the automated integration and unit test suite:
 ```bash
 npm test
 ```
-The test suite validates:
+The test suite utilizes a live in-memory MongoDB engine (`mongodb-memory-server`) and HTTP requests (`supertest`) to validate:
 1. **Password Hashing:** Salt generation, hashing, and `bcrypt.compare` verification.
-2. **JWT Security:** Signing, expiration, tampering rejection, and secret validation.
-3. **Auth Middleware:** Header missing, malformed token, and successful injection of `req.user`.
-4. **Concurrency & Double-Booking Prevention:** Simulates simultaneous booking attempts on identical seats, ensuring HTTP 409 Conflict rejection.
-5. **Seat Release on Cancellation:** Simulates `$pull` operations on seat release.
-6. **Seed Data Integrity:** Validates all required fields, durations, and movie catalogs.
-7. **Express Route Mounts:** Confirms all 11 REST endpoints are active and bound.
+2. **JWT Security:** Signing, 7-day expiration, tampering rejection, and secret validation.
+3. **Auth Middleware:** Missing header, malformed token, and successful injection of `req.user`.
+4. **Auth Endpoints:** Register, duplicate email 409 conflict, password length rules, email regex validation, login, wrong credentials rejection, and `/api/auth/me`.
+5. **Movies & Showtimes:** Catalog listing, genre filtering, search, **regex special character injection resilience** (`search=Dune+[`), and valid/malformed ObjectId 404 handling.
+6. **Real MongoDB Concurrency & Anti-Double-Booking:** Simulates simultaneous concurrent race conditions with `Promise.all` for identical seats, asserting that exactly one succeeds (201) while the other is rejected with `409 Conflict`.
+7. **Seat Validation & Duplicate Prevention:** Rejects duplicate seat requests in same payload (`400 Bad Request`) and invalid seat formats.
+8. **Soft Cancellation & Seat Release:** Verifies `$pull` removes seats from MongoDB showtime doc, prevents double-cancellation, and allows freed seats to be re-booked.
+9. **Health & Fallback Routes:** Checks root info, `/api/health`, and 404 fallbacks.
 
 ---
 

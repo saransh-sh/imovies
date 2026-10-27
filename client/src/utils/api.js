@@ -1,10 +1,28 @@
 import axios from 'axios';
 
+// Helper to resolve and normalize backend API URL across Render, Vercel, and local dev
+const resolveBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl || !envUrl.trim()) {
+    return '/api';
+  }
+  let url = envUrl.trim();
+  // If protocol is missing (e.g., from Render blueprint host property)
+  if (!/^https?:\/\//i.test(url)) {
+    url = `https://${url}`;
+  }
+  // Strip trailing slashes
+  url = url.replace(/\/+$/, '');
+  // Append /api only if not already present
+  if (!url.endsWith('/api')) {
+    url = `${url}/api`;
+  }
+  return url;
+};
+
 // Create Axios client with base URL
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL
-    ? `${import.meta.env.VITE_API_URL}/api`
-    : '/api',
+  baseURL: resolveBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },

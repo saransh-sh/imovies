@@ -1,4 +1,12 @@
 // Vercel Serverless Function entry point
 const app = require('../server/server');
+const connectDB = require('../server/config/db');
 
-module.exports = app;
+module.exports = async (req, res) => {
+  try {
+    await connectDB();
+  } catch (err) {
+    console.error('[Vercel Serverless] DB connection error:', err.message);
+  }
+  return app(req, res);
+};

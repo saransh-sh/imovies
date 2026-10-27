@@ -3,18 +3,23 @@ const router = express.Router();
 const Movie = require('../models/Movie');
 const Showtime = require('../models/Showtime');
 
+const mongoose = require('mongoose');
+
+// Helper to escape regex special characters
+const escapeRegex = (text) => text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+
 // GET /api/movies - List all movies
 router.get('/', async (req, res) => {
   try {
     const { genre, search } = req.query;
     let query = {};
 
-    if (genre && genre !== 'All') {
-      query.genre = new RegExp(genre, 'i');
+    if (genre && genre !== 'All' && typeof genre === 'string') {
+      query.genre = new RegExp(escapeRegex(genre.trim()), 'i');
     }
 
-    if (search) {
-      query.title = new RegExp(search, 'i');
+    if (search && typeof search === 'string' && search.trim()) {
+      query.title = new RegExp(escapeRegex(search.trim()), 'i');
     }
 
     const movies = await Movie.find(query).sort({ releaseDate: -1 });
@@ -36,7 +41,16 @@ router.get('/', async (req, res) => {
 // GET /api/movies/:id - Get single movie and its available showtimes
 router.get('/:id', async (req, res) => {
   try {
-    const movie = await Movie.findById(req.params.id);
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: 'Movie not found',
+      });
+    }
+
+    const movie = await Movie.findById(id);
     if (!movie) {
       return res.status(404).json({
         success: false,

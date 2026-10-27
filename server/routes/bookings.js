@@ -4,19 +4,52 @@ const Booking = require('../models/Booking');
 const Showtime = require('../models/Showtime');
 const authMiddleware = require('../middleware/auth');
 
+const mongoose = require('mongoose');
+
 // All booking routes require authentication
 router.use(authMiddleware);
 
+// Valid seat format: letter row + number column (e.g. A1, E8, C10)
+const SEAT_REGEX = /^[A-Z][0-9]{1,2}$/;
+
 // POST /api/bookings - Create booking with race condition prevention
 router.post('/', async (req, res) => {
+  let reservedSeats = null;
+  let showtimeTargetId = null;
+
   try {
     const { showtimeId, seats } = req.body;
     const userId = req.user.id;
 
-    if (!showtimeId || !seats || !Array.isArray(seats) || seats.length === 0) {
+    if (!showtimeId || !mongoose.Types.ObjectId.isValid(showtimeId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'A valid Showtime ID is required',
+      });
+    }
+
+    if (!seats || !Array.isArray(seats) || seats.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'Showtime ID and at least one seat selection are required',
+      });
+    }
+
+    // Sanitize and validate seat codes
+    const normalizedSeats = seats.map((s) => (typeof s === 'string' ? s.trim().toUpperCase() : ''));
+    if (normalizedSeats.some((s) => !s || !SEAT_REGEX.test(s))) {
+      return res.status(400).json({
+        success: false,
+        message: 'One or more selected seat identifiers are invalid (e.g. A1, B4)',
+      });
+    }
+
+    // Check for duplicate seat selections within the request itself
+    const uniqueSeats = Array.from(new Set(normalizedSeats));
+    if (uniqueSeats.length !== normalizedSeats.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'Duplicate seats detected in selection. Each seat may only be chosen once.',
       });
     }
 
@@ -30,13 +63,14 @@ router.post('/', async (req, res) => {
     }
 
     // Atomic update: only book if NONE of the selected seats are already in bookedSeats
+    showtimeTargetId = showtimeId;
     const updatedShowtime = await Showtime.findOneAndUpdate(
       {
         _id: showtimeId,
-        bookedSeats: { $nin: seats },
+        bookedSeats: { $nin: uniqueSeats },
       },
       {
-        $push: { bookedSeats: { $each: seats } },
+        $push: { bookedSeats: { $each: uniqueSeats } },
       },
       { new: true }
     );
@@ -48,12 +82,13 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const totalAmount = seats.length * showtime.price;
+    reservedSeats = uniqueSeats;
+    const totalAmount = uniqueSeats.length * showtime.price;
 
     const booking = new Booking({
       userId,
       showtimeId,
-      seats,
+      seats: uniqueSeats,
       totalAmount,
       status: 'confirmed',
     });
@@ -73,6 +108,18 @@ router.post('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Create booking error:', error);
+
+    // Rollback reserved seats if booking save failed unexpectedly
+    if (reservedSeats && showtimeTargetId) {
+      try {
+        await Showtime.findByIdAndUpdate(showtimeTargetId, {
+          $pull: { bookedSeats: { $in: reservedSeats } },
+        });
+      } catch (rollbackErr) {
+        console.error('Seat rollback failure:', rollbackErr);
+      }
+    }
+
     return res.status(500).json({
       success: false,
       message: 'Failed to create booking',
@@ -112,6 +159,13 @@ router.patch('/:id/cancel', async (req, res) => {
   try {
     const bookingId = req.params.id;
     const userId = req.user.id;
+
+    if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found',
+      });
+    }
 
     const booking = await Booking.findById(bookingId);
     if (!booking) {

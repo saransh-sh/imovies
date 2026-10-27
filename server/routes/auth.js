@@ -23,10 +23,27 @@ router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
+    if (
+      !name ||
+      !email ||
+      !password ||
+      typeof name !== 'string' ||
+      typeof email !== 'string' ||
+      typeof password !== 'string'
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'Name, email, and password are required',
+        message: 'Name, email, and password are required and must be valid strings',
+      });
+    }
+
+    const trimmedName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (trimmedName.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Name cannot be blank',
       });
     }
 
@@ -37,7 +54,15 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address format',
+      });
+    }
+
+    const existingUser = await User.findOne({ email: cleanEmail });
     if (existingUser) {
       return res.status(409).json({
         success: false,
@@ -46,8 +71,8 @@ router.post('/register', async (req, res) => {
     }
 
     const user = new User({
-      name,
-      email: email.toLowerCase(),
+      name: trimmedName,
+      email: cleanEmail,
       password,
     });
 
@@ -80,14 +105,20 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
+    if (
+      !email ||
+      !password ||
+      typeof email !== 'string' ||
+      typeof password !== 'string'
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'Email and password are required',
+        message: 'Email and password are required valid strings',
       });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
     if (!user) {
       return res.status(401).json({
         success: false,

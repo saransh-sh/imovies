@@ -38,6 +38,20 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Database connection middleware for both persistent and serverless executions
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    return res.status(503).json({
+      success: false,
+      message: 'Database connection unavailable. Please check MONGO_URI configuration.',
+      error: err.message,
+    });
+  }
+});
+
 // Mount API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/movies', movieRoutes);
@@ -54,7 +68,25 @@ app.use((req, res, next) => {
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  console.error('[Error Handler]', err);
+  console.error('[Error Handler]', err.message || err);
+
+  // Handle Mongoose CastError (invalid ObjectId)
+  if (err.name === 'CastError') {
+    return res.status(404).json({
+      success: false,
+      message: `Resource not found with specified identifier (${err.value})`,
+    });
+  }
+
+  // Handle Mongoose ValidationError
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({
+      success: false,
+      message: 'Validation failed',
+      errors: Object.values(err.errors).map((e) => e.message),
+    });
+  }
+
   const status = err.statusCode || 500;
   res.status(status).json({
     success: false,
